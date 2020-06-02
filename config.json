@@ -1,0 +1,9 @@
+{
+	"COMMENT":"THIS IS AN EXAMPLE FILE",
+	"REPORT_DIR":"reports/",
+	"VENDOR_ID":"ID",
+	"ADD_ON":"VENDOR ADD ON ID",
+	"AUTH_EMAIL":"EMAIL",
+	"AUTH_PW":"PW",
+	"SEARCH_FILES":["LIST OF CSV FILES", "may20_emea_emails.csv","may20_us_emaildomains.csv","may20_us_emails.csv"]
+}
