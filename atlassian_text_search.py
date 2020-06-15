@@ -40,22 +40,26 @@ def license_lookup(search_text, time_range, index, row_num, inputfile):
     info = requests.get(export_licenses, auth=(auth_email, auth_pw))
     # Write to .CSV
     filename = report_dir+'licenses_'+inputfile
-    f = open(filename, "a")
+    f = open(filename, "a", encoding="utf-8")
     split = info.text.split("\n")
-    print(str(index))
     line_num=0 #track line number in single API call
     for line in split:
         if index is not 0:
             if line_num is not 0:
-                print(str(line))
-                f.write(line + "\n")
+                print("************DATA*****************")
+                print(line)
+                f.write(line)
+                f.write("\n")
         elif index is 0:
             if row_num is 0:
-                print(str(line))
-                f.write(line + "\n")
+                print("<<<<<<<<<HEADER>>>>>>>>>")
+                f.write(line)
+                f.write("\n")
             elif line_num is not 0:
-                print(str(line))
-                f.write(line + "\n")
+                print("************DATA*****************")
+                print(line)
+                f.write(line)
+                f.write("\n")
         line_num = line_num + 1
     f.close()
 
@@ -79,21 +83,22 @@ def transactions_lookup(search_text, time_range, index, row_num, inputfile):
     info = requests.get(export_transactions, auth=(auth_email, auth_pw))
     # Write to .CSV
     filename = report_dir+'transactions_'+inputfile
-    f = open(filename, "a")
+    f = open(filename, "a", encoding="utf-8")
     split = info.text.split("\n")
-    print(str(index))
     line_num=0 # track line number in single API call
     for line in split:
         if index is not 0:
             if line_num is not 0:
-                print(str(line))
+                print("************DATA*****************")
+                print(line)
                 f.write(line + "\n")
         elif index is 0:
             if row_num is 0:
-                print(str(line))
+                print("<<<<<<<<<HEADER>>>>>>>>>")
                 f.write(line + "\n")
             elif line_num is not 0:
-                print(str(line))
+                print("************DATA*****************")
+                print(line)
                 f.write(line + "\n")
         line_num = line_num + 1
     f.close()
@@ -114,5 +119,6 @@ if __name__ == '__main__':
             readCSV = csv.reader(csvfile, delimiter=',')
             row_num = 0
             for row in readCSV:
-                transactions_lookup(row[0],'30', 0, row_num, filename)
+                transactions_lookup(row[0],'30', index, row_num, filename)
                 row_num = row_num + 1
+        index = index + 1
