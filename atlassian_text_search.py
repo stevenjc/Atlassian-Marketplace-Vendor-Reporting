@@ -10,7 +10,7 @@ with open('config.json', 'r') as file:
 
 
 auth_email=config['AUTH_EMAIL']
-auth_pw=config['AUTH_PW']
+auth_pw=config['AUTH_TOKEN']
 report_dir=config['REPORT_DIR']
 search_files=config["SEARCH_FILES"]
 vendor_id=config["VENDOR_ID"]
@@ -18,6 +18,37 @@ addon=config["ADD_ON"]
 
 base_url = "https://marketplace.atlassian.com/rest/2/vendors/"+vendor_id+"/reporting/"
 
+def check_status_code(response):
+    code = response.status_code
+    if code == 200:
+        print("Successful API Call")
+    elif code == 401:
+        print ("ERROR: 401 Unauthorized")
+        print(response.text)
+        exit()
+    elif code == 400:
+        print ("ERROR: 400 Request body is malformed or has an illegal property value.")
+        print(response.text)
+        exit()
+    elif code == 403:
+        print ("ERROR: 403 User was authenticated but is not authorized for this operation.")
+        print(response.text)
+        exit()
+    elif code == 404:
+        print ("ERROR: 404 Resource does not exist or is not visible to this user.")
+        print(response.text)
+        exit()
+    elif code == 500:
+        print ("ERROR: 500 Unexpected internal error in the Atlassian Marketplace.")
+        print(response.text)
+        exit()
+    elif code == 502:
+        print ("ERROR: 500 Unexpected error in an external service.")
+        print(response.text)
+        exit()
+    
+            
+        
 def license_lookup(search_text, time_range, index, row_num, inputfile):
     print("Searching for - " + search_text)  
     #Starting date for the query. Format: Date
@@ -38,6 +69,9 @@ def license_lookup(search_text, time_range, index, row_num, inputfile):
     print(export_licenses)
     
     info = requests.get(export_licenses, auth=(auth_email, auth_pw))
+
+    check_status_code(info)
+    
     # Write to .CSV
     filename = report_dir+'licenses_'+inputfile
     f = open(filename, "a", encoding="utf-8")
@@ -81,6 +115,7 @@ def transactions_lookup(search_text, time_range, index, row_num, inputfile):
     print(export_transactions)
     
     info = requests.get(export_transactions, auth=(auth_email, auth_pw))
+    
     # Write to .CSV
     filename = report_dir+'transactions_'+inputfile
     f = open(filename, "a", encoding="utf-8")
@@ -102,7 +137,8 @@ def transactions_lookup(search_text, time_range, index, row_num, inputfile):
                 f.write(line + "\n")
         line_num = line_num + 1
     f.close()
-    
+
+        
 if __name__ == '__main__':
     index = 0 # track file number
     for filename in search_files:
