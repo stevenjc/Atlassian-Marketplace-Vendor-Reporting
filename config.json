@@ -4,6 +4,6 @@
 	"VENDOR_ID":"ID",
 	"ADD_ON":"VENDOR ADD ON ID",
 	"AUTH_EMAIL":"EMAIL",
-	"AUTH_PW":"PW",
+	"AUTH_TOKEN":"PW",
 	"SEARCH_FILES":["LIST OF CSV FILES", "may20_emea_emails.csv","may20_us_emaildomains.csv","may20_us_emails.csv"]
 }
