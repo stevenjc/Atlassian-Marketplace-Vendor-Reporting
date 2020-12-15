@@ -21,7 +21,7 @@ base_url = "https://marketplace.atlassian.com/rest/2/vendors/" + vendor_id + "/r
 def check_status_code(response):
     code = response.status_code
     if code == 200:
-        print("Successful API Call")
+        print("Successful 200 Status API Call")
     elif code == 401:
         print("ERROR: 401 Unauthorized")
         print(response.text)
@@ -43,35 +43,44 @@ def check_status_code(response):
         print(response.text)
         exit()
     elif code == 502:
-        print("ERROR: 500 Unexpected error in an external service.")
+        print("ERROR: 502 Unexpected error in an external service.")
         print(response.text)
         exit()
     else:
         print("ERROR: Unknown status code")
-        print(response.text)
+        print(response.status_code + "\n" + response.text)
         exit()
 
-def track_successful_searches(input_file, search_term):
-    filename = report_dir + 'matches_' + input_file
+
+def track_successful_searches(input_file, search_term):  # write successful search terms into csv
+    filename = report_dir + 'search_terms_matches_' + input_file
     f = open(filename, "a", encoding="utf-8")
     f.write(search_term)
     f.write("\n")
+    f.close()
 
-def license_lookup(search_text, time_range, index, row_num, input_file):
-    print("Searching for licenses associated with term - " + search_text)
+
+def track_failed_searches(input_file, search_term):  # write search terms without data into csv
+    filename = report_dir + 'search_terms_no_matches_' + input_file
+    f = open(filename, "a", encoding="utf-8")
+    f.write(search_term)
+    f.write("\n")
+    f.close()
+
+
+def license_lookup(search_term, time_range, index, row_num, input_file):
+    print("Searching for licenses associated with term - " + search_term)
     # Starting date for the query. Format: Date
     start_date = str(datetime.strftime(datetime.now() - timedelta(int(time_range)), '%Y-%m-%d'))
     # End date for the query. Format: Date
     end_date = str(datetime.strftime(datetime.now(), '%Y-%m-%d'))
     # The date field against which filters will be applied. Valid values: end, start
     date_type = "start"
-    # Text to search for in license fields (license id, customer information and partner information)
-    text = search_text
     # If specified, retrieve marketing funnel attribution data. Must supply a start date after July 2018
     with_attribution = "false"
     # Specifies the response format. If unspecified, the 'Accept' header will be used.Valid values: csv, json
     accept = "csv"
-    export_licenses = base_url + "licenses/export?addon=" + addon + "&text=" + text + "&withAttribution=" + with_attribution + "&accept=" + accept + "&status=active"
+    export_licenses = base_url + "licenses/export?addon=" + addon + "&text=" + search_term + "&withAttribution=" + with_attribution + "&accept=" + accept + "&status=active"
 
     # "&startDate="+start_date+"&endDate="+end_date+"&dateType="+date_type+
     print(export_licenses)
@@ -86,40 +95,39 @@ def license_lookup(search_text, time_range, index, row_num, input_file):
     split = info.text.split("\n")
     line_num = 0  # track line number in single API call
     for line in split:
-        if str(line): #checks that string returns true indicating it is not empty
-            if row_num is 0:    #First row of search terms
+        if str(line):  # checks that string returns true indicating it is not empty
+            if row_num is 0:  # First row of search terms
                 # print("<<<<<<<<<HEADER>>>>>>>>>")
                 f.write(line)
                 f.write("\n")
-            elif index is not 0 and line_num is not 0: #Not First File and Not First Line of API Call
+            elif index is not 0 and line_num is not 0:  # Not First File and Not First Line of API Call
                 print("************DATA FOUND*****************")
                 print(line)
                 f.write(line)
                 f.write("\n")
-                track_successful_searches('licenses_' + input_file,text)
-            elif index is 0 and line_num is not 0: #First File and Not First line of API Call
-                    print("************DATA FOUND*****************")
-                    print(line)
-                    f.write(line)
-                    f.write("\n")
-                    track_successful_searches('licenses_' + input_file, text)
+                track_successful_searches('licenses_' + input_file, search_term)
+            elif index is 0 and line_num is not 0:  # First File and Not First line of API Call
+                print("************DATA FOUND*****************")
+                print(line)
+                f.write(line)
+                f.write("\n")
+                track_successful_searches('licenses_' + input_file, search_term)
             line_num = line_num + 1
+        track_failed_searches('licenses_' + input_file, search_term)
     f.close()
 
 
-def transactions_lookup(search_text, time_range, index, row_num, input_file):
-    print("Searching for transactions associated with - " + search_text)
+def transactions_lookup(search_term, time_range, index, row_num, input_file):
+    print("Searching for transactions associated with - " + search_term)
     # Starting date for the query. Format: Date
     start_date = str(datetime.strftime(datetime.now() - timedelta(int(time_range)), '%Y-%m-%d'))
     # End date for the query. Format: Date
     end_date = str(datetime.strftime(datetime.now(), '%Y-%m-%d'))
     # The date field against which filters will be applied. Valid values: end, start
     date_type = "start"
-    # Text to search for in license fields (license id, customer information and partner information)
-    text = search_text
     # Specifies the response format. If unspecified, the 'Accept' header will be used.Valid values: csv, json
     accept = "csv"
-    export_transactions = base_url + "sales/transactions/export?addon=" + addon + "&text=" + text + "&accept=" + accept + "&startDate=" + start_date + "&endDate=" + end_date + "&dateType=" + date_type
+    export_transactions = base_url + "sales/transactions/export?addon=" + addon + "&text=" + search_term + "&accept=" + accept + "&startDate=" + start_date + "&endDate=" + end_date + "&dateType=" + date_type
 
     # "&startDate="+start_date+"&endDate="+end_date+"&dateType="+date_type+
     print(export_transactions)
@@ -142,13 +150,13 @@ def transactions_lookup(search_text, time_range, index, row_num, input_file):
                 print(line)
                 f.write(line)
                 f.write("\n")
-                track_successful_searches('transactions_' + input_file, text)
+                track_successful_searches('transactions_' + input_file, search_term)
             elif index is 0 and line_num is not 0:  # First File and Not First line of API Call
                 print("************DATA FOUND*****************")
                 print(line)
                 f.write(line)
                 f.write("\n")
-                track_successful_searches('transactions_' + input_file, text)
+                track_successful_searches('transactions_' + input_file, search_term)
             line_num = line_num + 1
     f.close()
 
