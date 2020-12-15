@@ -2,6 +2,7 @@ import json
 import os
 import requests
 from datetime import datetime, timedelta
+import time
 import boto3, botocore
 import csv
 
@@ -103,6 +104,7 @@ def license_lookup(search_term, time_range, index, row_num, input_file):
             elif index is not 0 and line_num is not 0:  # Not First File and Not First Line of API Call
                 print("************DATA FOUND*****************")
                 print(line)
+                print("\n")
                 f.write(line)
                 f.write("\n")
                 track_successful_searches('licenses_' + input_file, search_term)
@@ -148,12 +150,14 @@ def transactions_lookup(search_term, time_range, index, row_num, input_file):
             elif index is not 0 and line_num is not 0:  # Not First File and Not First Line of API Call
                 print("************DATA FOUND*****************")
                 print(line)
+                print("\n")
                 f.write(line)
                 f.write("\n")
                 track_successful_searches('transactions_' + input_file, search_term)
             elif index is 0 and line_num is not 0:  # First File and Not First line of API Call
                 print("************DATA FOUND*****************")
                 print(line)
+                print("\n")
                 f.write(line)
                 f.write("\n")
                 track_successful_searches('transactions_' + input_file, search_term)
@@ -170,7 +174,10 @@ if __name__ == '__main__':
             for row in readCSV:
                 license_lookup(row[0], '60', index, row_num, filename)
                 row_num = row_num + 1
+                time.sleep(1)
         index = index + 1
+    print("Licenses Look-Up Completed!" + "\n\n\n\n\n")
+    time.sleep(10)
     index = 0
     for filename in search_files:
         with open(filename) as csvfile:
@@ -179,4 +186,6 @@ if __name__ == '__main__':
             for row in readCSV:
                 transactions_lookup(row[0], '30', index, row_num, filename)
                 row_num = row_num + 1
+                time.sleep(1)
         index = index + 1
+    print("Transactions Look-Up Completed!" + "\n\n\n\n\n")
