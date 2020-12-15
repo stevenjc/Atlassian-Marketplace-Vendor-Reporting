@@ -31,7 +31,7 @@ ADD_ON: ID of Vendor Add-on
 
 AUTH_EMAIL: Email of account with Reporting Permissions to Vendor Account.
 
-AUTH_PW: Password of account with Reporting Permissions to Vendor Account.
+AUTH_TOKEN: Authentication token generated from account with Reporting Permissions to Vendor Account. Generate token here - https://id.atlassian.com/manage-profile/security/api-tokens
 
 SEARCH_FILES: Array(List) of files that contain search text *NOTE Files should be single column csv with search terms.
 
@@ -41,7 +41,7 @@ All fields are required.
 ## Execution Instructions
 
 Execute script 
-`python email_lookup.py`
+`python atlassian_text_search.py`
 
 ## License
 
