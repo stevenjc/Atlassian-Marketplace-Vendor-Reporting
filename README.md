@@ -2,7 +2,7 @@
 
 Purpose: Correlate a list of emails and emails domains to transactions/licenses in the Atlassian Marketplace automatically.
 
-This python utility takes lists of search terms as single column CSV files and searchs for active licenses and transactions (within 30days) tied to those terms. The output is a licenses and transactions csv files for each 
+This python utility takes lists of search terms as single column CSV files (without header row) and searchs for active licenses and transactions (within 60days) tied to those terms. The output is a licenses and transactions csv files for each 
 
 ## Important Note 
 
